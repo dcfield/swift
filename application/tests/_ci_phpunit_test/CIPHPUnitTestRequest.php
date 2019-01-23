@@ -10,9 +10,6 @@
 
 class CIPHPUnitTestRequest
 {
-    /**
-     * @var TestCase
-     */
 	protected $testCase;
 
 	/**
@@ -29,20 +26,20 @@ class CIPHPUnitTestRequest
 	 * @var callable[] callable called post controller constructor
 	 */
 	protected $callables = [];
-
+	
 	/**
 	 * @var callable[] callable called pre controller constructor
 	 */
 	protected $callablePreConstructors = [];
 
 	protected $enableHooks = false;
-
+	
 	/**
 	 * @var CI_Hooks
 	 */
 	protected $hooks;
 
-	public function __construct(CIPHPUnitTestCase $testCase)
+	public function __construct(PHPUnit_Framework_TestCase $testCase)
 	{
 		$this->testCase = $testCase;
 		$this->superGlobal = new CIPHPUnitTestSuperGlobal();
@@ -51,7 +48,7 @@ class CIPHPUnitTestRequest
 
 	/**
 	 * Set HTTP request header
-	 *
+	 * 
 	 * @param string $name  header name
 	 * @param string $value value
 	 */
@@ -62,7 +59,7 @@ class CIPHPUnitTestRequest
 
 	/**
 	 * Set $_FILES
-	 *
+	 * 
 	 * @param array $files
 	 */
 	public function setFiles(array $files)
@@ -72,7 +69,7 @@ class CIPHPUnitTestRequest
 
 	/**
 	 * Set (and Reset) callable
-	 *
+	 * 
 	 * @param callable $callable function to run after controller instantiation
 	 */
 	public function setCallable(callable $callable)
@@ -83,7 +80,7 @@ class CIPHPUnitTestRequest
 
 	/**
 	 * Add callable
-	 *
+	 * 
 	 * @param callable $callable function to run after controller instantiation
 	 */
 	public function addCallable(callable $callable)
@@ -93,7 +90,7 @@ class CIPHPUnitTestRequest
 
 	/**
 	 * Set (and Reset) callable pre constructor
-	 *
+	 * 
 	 * @param callable $callable function to run before controller instantiation
 	 */
 	public function setCallablePreConstructor(callable $callable)
@@ -104,7 +101,7 @@ class CIPHPUnitTestRequest
 
 	/**
 	 * Add callable pre constructor
-	 *
+	 * 
 	 * @param callable $callable function to run before controller instantiation
 	 */
 	public function addCallablePreConstructor(callable $callable)
@@ -131,10 +128,6 @@ class CIPHPUnitTestRequest
 	 */
 	public function request($http_method, $argv, $params = [])
 	{
-		if ($this->testCase->getStrictRequestErrorCheck()) {
-			$this->testCase->enableStrictErrorCheck();
-		}
-
 		if (is_string($argv))
 		{
 			$argv = ltrim($argv, '/');
@@ -149,23 +142,18 @@ class CIPHPUnitTestRequest
 		try {
 			if (is_array($argv))
 			{
-				$ret = $this->callControllerMethod(
+				return $this->callControllerMethod(
 					$http_method, $argv, $params
 				);
-				$this->testCase->disableStrictErrorCheck();
-				return $ret;
 			}
 			else
 			{
-				$ret = $this->requestUri($http_method, $argv, $params);
-				$this->testCase->disableStrictErrorCheck();
-				return $ret;
+				return $this->requestUri($http_method, $argv, $params);
 			}
 		}
 		// redirect()
 		catch (CIPHPUnitTestRedirectException $e)
 		{
-			$this->testCase->disableStrictErrorCheck();
 			if ($e->getCode() === 0)
 			{
 				set_status_header(200);
@@ -180,21 +168,18 @@ class CIPHPUnitTestRequest
 		// show_404()
 		catch (CIPHPUnitTestShow404Exception $e)
 		{
-			$this->testCase->disableStrictErrorCheck();
 			$this->processError($e);
 			return $e->getMessage();
 		}
 		// show_error()
 		catch (CIPHPUnitTestShowErrorException $e)
 		{
-			$this->testCase->disableStrictErrorCheck();
 			$this->processError($e);
 			return $e->getMessage();
 		}
 		// exit()
 		catch (CIPHPUnitTestExitException $e)
 		{
-			$this->testCase->disableStrictErrorCheck();
 			$output = ob_get_clean();
 			return $output;
 		}
@@ -346,13 +331,8 @@ class CIPHPUnitTestRequest
 		// Set CodeIgniter instance to TestCase
 		$this->testCase->setCI($CI);
 
-		if (! isset($CI->output->_status))
-		{
-			// Prevent overwriting, if already set in the $class::__construct()
-			// Set default response code 200
-			set_status_header(200);
-		}
-
+		// Set default response code 200
+		set_status_header(200);
 		// Run callable
 		if ($this->callables !== [])
 		{
@@ -386,7 +366,7 @@ class CIPHPUnitTestRequest
 
 	/**
 	 * Get HTTP Status Code Info
-	 *
+	 * 
 	 * @return array ['code' => code, 'text' => text]
 	 * @throws LogicException
 	 */

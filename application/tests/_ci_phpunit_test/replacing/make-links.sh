@@ -13,7 +13,7 @@ fi
 
 version="$1"
 
-. ../../../../bin/filelist.sh
+. filelist.sh
 
 for i in $list
 do

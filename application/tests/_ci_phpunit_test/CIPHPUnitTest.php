@@ -15,15 +15,11 @@ class CIPHPUnitTest
 
 	/**
 	 * Initialize CIPHPUnitTest
-	 *
+	 * 
 	 * @param array $autoload_dirs directories to search class file for autoloader
 	 */
 	public static function init(array $autoload_dirs = null)
 	{
-		if (! defined('TESTPATH')) {
-			define('TESTPATH', APPPATH.'tests'.DIRECTORY_SEPARATOR);
-		}
-
 		// Fix CLI args
 		$_server_backup = $_SERVER;
 		$_SERVER['argv'] = [
@@ -33,24 +29,18 @@ class CIPHPUnitTest
 		$_SERVER['argc'] = 2;
 
 		self::$autoload_dirs = $autoload_dirs;
-
+		
 		$cwd_backup = getcwd();
 
 		// Load autoloader for ci-phpunit-test
 		require __DIR__ . '/autoloader.php';
 
-		require TESTPATH . 'TestCase.php';
+		require APPPATH . '/tests/TestCase.php';
 
-		$db_test_case_file = TESTPATH . 'DbTestCase.php';
+		$db_test_case_file = APPPATH . '/tests/DbTestCase.php';
 		if (is_readable($db_test_case_file))
 		{
 			require $db_test_case_file;
-		}
-
-		$unit_test_case_file = TESTPATH . 'UnitTestCase.php';
-		if (is_readable($unit_test_case_file))
-		{
-			require $unit_test_case_file;
 		}
 
 		// Replace a few Common functions
@@ -67,10 +57,8 @@ class CIPHPUnitTest
 		require __DIR__ . '/replacing/core/Loader.php';
 		// Load ci-phpunit-test CI_Input
 		require __DIR__ . '/replacing/core/Input.php';
-		// Load ci-phpunit-test CI_Output
-		require __DIR__ . '/replacing/core/Output.php';
 
-		// Change current directory
+		// Change current directroy
 		chdir(FCPATH);
 
 		/*
@@ -99,7 +87,7 @@ class CIPHPUnitTest
 
 		// Restore $_SERVER. We need this for NetBeans
 		$_SERVER = $_server_backup;
-
+		
 		// Restore cwd to use `Usage: phpunit [options] <directory>`
 		chdir($cwd_backup);
 	}
@@ -123,7 +111,7 @@ class CIPHPUnitTest
 		{
 			return true;
 		}
-
+		
 		return false;
 	}
 
@@ -134,7 +122,7 @@ class CIPHPUnitTest
 
 	protected static function replaceLoader()
 	{
-		$my_loader_file =
+		$my_loader_file = 
 			APPPATH . 'core/' . config_item('subclass_prefix') . 'Loader.php';
 
 		if (file_exists($my_loader_file))
@@ -170,7 +158,7 @@ class CIPHPUnitTest
 	{
 		if ($dir === null)
 		{
-			$dir = TESTPATH . '_ci_phpunit_test/tmp/cache';
+			$dir = APPPATH . 'tests/_ci_phpunit_test/tmp/cache';
 		}
 
 		MonkeyPatchManager::setCacheDir(

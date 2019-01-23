@@ -20,5 +20,5 @@ spl_autoload_register([$autoloader, 'load']);
 
 // Register CodeIgniter's tests/mocks/autoloader.php
 define('SYSTEM_PATH', BASEPATH);
-require TESTPATH .'mocks/autoloader.php';
+require APPPATH .'tests/mocks/autoloader.php';
 spl_autoload_register('autoload');
